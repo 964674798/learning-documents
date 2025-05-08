@@ -26,7 +26,7 @@ export default async function Home() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-3">阅读笔记</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-4">包含新闻、文章和书籍的阅读笔记和摘要。</p>
-          <Link href="/reading" className="text-blue-600 dark:text-blue-400 hover:underline">
+          <Link href="/reading" className="text-blue-600 dark:text-blue-400 no-underline">
             查看阅读笔记 →
           </Link>
         </div>
@@ -34,7 +34,7 @@ export default async function Home() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-3">日常生活</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-4">记录生活计划、财务预算和健康管理。</p>
-          <Link href="/daily-life" className="text-blue-600 dark:text-blue-400 hover:underline">
+          <Link href="/daily-life" className="text-blue-600 dark:text-blue-400 no-underline">
             查看生活记录 →
           </Link>
         </div>
@@ -42,7 +42,7 @@ export default async function Home() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-3">技术学习</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-4">包含各种编程语言和技术框架的学习笔记。</p>
-          <Link href="/tech-learning" className="text-blue-600 dark:text-blue-400 hover:underline">
+          <Link href="/tech-learning" className="text-blue-600 dark:text-blue-400 no-underline">
             查看技术笔记 →
           </Link>
         </div>
@@ -56,7 +56,7 @@ export default async function Home() {
               <li key={`${doc.category}-${doc.subcategory}-${doc.slug}`} className="flex justify-between items-center">
                 <Link 
                   href={`/${doc.category.toLowerCase().replace('_', '-')}/${doc.subcategory.toLowerCase()}/${doc.date}`} 
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                  className="text-blue-600 dark:text-blue-400 no-underline"
                 >
                   {doc.title} ({doc.subcategory})
                 </Link>

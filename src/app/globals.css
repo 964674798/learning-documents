@@ -36,6 +36,11 @@ body {
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold;
   }
+  
+  /* 平滑滚动 */
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 /* 自定义列表样式 */
@@ -83,6 +88,91 @@ body {
 
 .markdown-body li {
   display: list-item;
+}
+
+/* 目录导航相关样式 */
+nav ul li {
+  transition: all 0.3s ease-in-out;
+  position: relative;
+}
+
+nav ul li button {
+  transition: all 0.3s ease-in-out;
+}
+
+/* 活动目录项样式 */
+.toc-active {
+  background-color: #3b82f6 !important; /* 蓝色背景 */
+  color: white !important;
+  font-weight: 500 !important;
+  box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3);
+  position: relative;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.toc-active::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background-color: #3b82f6;
+  border-radius: 0 4px 4px 0;
+}
+
+.toc-active button {
+  font-weight: 600 !important;
+  color: white !important;
+}
+
+/* 全局滚动条样式 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+/* WebKit 样式 (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.7);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.3);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.5);
+}
+
+/* 目录滚动条样式 - 更细的版本 */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* 当不滚动时隐藏滚动条，滚动时显示 */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.overflow-y-auto:hover {
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
 }
 
 /* GitHub Markdown 亮色模式增强样式 */

@@ -1,9 +1,5 @@
 import { notFound } from "next/navigation";
-import dynamic from "next/dynamic";
-
-const DocumentRenderer = dynamic(() => import("../../../components/DocumentRenderer"), {
-  ssr: true
-});
+import MarkdownRenderer from "../../../components/MarkdownRenderer";
 
 interface PageProps {
   params: {
@@ -74,7 +70,7 @@ export default function DocumentPage({ params }: PageProps) {
   const document = docData[slug];
   
   return (
-    <DocumentRenderer
+    <MarkdownRenderer
       title={document.title}
       date={document.date}
       content={document.content}
