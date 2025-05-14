@@ -5,7 +5,7 @@ import { cache } from 'react';
 export interface DocInfo {
   slug: string;
   title: string;
-  date: string;
+  date?: string; // 使日期可选
   content: string;
   category: string;
   subcategory: string;
@@ -36,28 +36,27 @@ export const getDocumentsByCategory = cache(async (category: string): Promise<Do
         const filePath = path.join(subcategoryPath, file);
         const content = fs.readFileSync(filePath, 'utf8');
         
-        // 从文件名解析信息，格式: 日期_功能_小分类_大分类.md
+        // 获取文件名（不带扩展名）
         const fileName = path.basename(file, '.md');
-        const parts = fileName.split('_');
+        let title = fileName;
         
-        if (parts.length >= 2) {
-          const date = parts[0]; // 日期
-          const title = parts.length >= 3 ? parts[2] : parts[1]; // 标题
-          
-          allDocs.push({
-            slug: fileName,
-            title,
-            date,
-            content,
-            category,
-            subcategory
-          });
+        // 从文件内容中提取标题（假设第一行是# 标题格式）
+        const firstLine = content.split('\n')[0];
+        if (firstLine && firstLine.startsWith('# ')) {
+          title = firstLine.substring(2).trim();
         }
+        
+        allDocs.push({
+          slug: fileName,
+          title,
+          content,
+          category,
+          subcategory
+        });
       }
     }
 
-    // 按日期倒序排列
-    return allDocs.sort((a, b) => b.date.localeCompare(a.date));
+    return allDocs;
 
   } catch (error) {
     console.error(`Error reading documents from ${category}:`, error);
@@ -69,36 +68,67 @@ export const getDocumentBySlug = cache(async (category: string, subcategory: str
   try {
     const subcategoryPath = path.join(DOCS_ROOT, category, subcategory);
     
-    // 寻找匹配slug的文件
-    const files = fs.readdirSync(subcategoryPath)
-      .filter(file => file.startsWith(slug) && file.endsWith('.md'));
+    // 处理可能被 URL 编码的 slug
+    const decodedSlug = decodeURIComponent(slug);
+    console.log('Getting document with slug:', slug);
+    console.log('Decoded slug:', decodedSlug);
     
-    if (files.length === 0) {
-      return null;
+    // 尝试完全匹配slug.md
+    let fileName = `${decodedSlug}.md`;
+    let filePath = path.join(subcategoryPath, fileName);
+    
+    console.log('Looking for file:', filePath);
+    console.log('File exists?', fs.existsSync(filePath));
+    
+    // 如果精确匹配的文件不存在，尝试模糊匹配
+    if (!fs.existsSync(filePath)) {
+      console.log('Exact match not found, trying fuzzy matching');
+      const files = fs.readdirSync(subcategoryPath)
+        .filter(file => file.endsWith('.md'));
+      
+      console.log('Available files:', files);
+      
+      // 尝试查找包含slug的文件名
+      const matchingFile = files.find(file => {
+        const fileNameLower = file.toLowerCase();
+        const slugLower = decodedSlug.toLowerCase();
+        const match = fileNameLower.includes(slugLower) || slugLower.includes(path.basename(file, '.md').toLowerCase());
+        console.log(`Checking ${file} against ${decodedSlug}: ${match ? 'Match' : 'No match'}`);
+        return match;
+      });
+      
+      if (!matchingFile) {
+        console.log('No matching file found');
+        return null;
+      }
+      
+      fileName = matchingFile;
+      filePath = path.join(subcategoryPath, fileName);
+      console.log('Found matching file:', fileName);
     }
     
-    const filePath = path.join(subcategoryPath, files[0]);
     const content = fs.readFileSync(filePath, 'utf8');
     
-    // 从文件名解析信息
-    const fileName = path.basename(files[0], '.md');
-    const parts = fileName.split('_');
+    // 获取文件名（不带扩展名）
+    const fileNameWithoutExt = path.basename(fileName, '.md');
+    let title = fileNameWithoutExt;
     
-    if (parts.length >= 2) {
-      const date = parts[0]; // 日期
-      const title = parts.length >= 3 ? parts[2] : parts[1]; // 标题
-      
-      return {
-        slug: fileName,
-        title,
-        date,
-        content,
-        category,
-        subcategory
-      };
+    // 从文件内容中提取标题
+    const firstLine = content.split('\n')[0];
+    if (firstLine && firstLine.startsWith('# ')) {
+      title = firstLine.substring(2).trim();
     }
     
-    return null;
+    console.log('Successfully loaded document:', title);
+    
+    return {
+      slug: fileNameWithoutExt,
+      title,
+      content,
+      category,
+      subcategory
+    };
+    
   } catch (error) {
     console.error(`Error reading document ${slug} from ${category}/${subcategory}:`, error);
     return null;

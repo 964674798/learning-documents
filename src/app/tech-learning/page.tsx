@@ -8,7 +8,7 @@ export default async function TechLearningPage() {
   return (
     <CategoryPage
       title="技术学习"
-      description="这里包含各种编程语言和技术框架的学习笔记和总结。"
+      description="这里包含各种编程语言、技术框架和认证考试的学习资料。"
       categoryPath="tech-learning"
       documents={docs}
       emptyMessage="暂无技术学习文档"

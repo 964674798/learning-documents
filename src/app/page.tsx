@@ -9,9 +9,14 @@ export default async function Home() {
     getDocumentsByCategory('Daily_Life')
   ]);
   
-  // 合并所有文档并按日期排序
+  // 合并所有文档并按日期排序（处理可能为undefined的日期）
   const allDocs = [...techDocs, ...readingDocs, ...dailyLifeDocs]
-    .sort((a, b) => b.date.localeCompare(a.date))
+    .sort((a, b) => {
+      // 如果日期不存在，使用当前日期
+      const dateA = a.date || new Date().toISOString().split('T')[0];
+      const dateB = b.date || new Date().toISOString().split('T')[0];
+      return dateB.localeCompare(dateA);
+    })
     .slice(0, 5); // 只取最近5篇
   
   return (
@@ -51,21 +56,21 @@ export default async function Home() {
       <div className="mt-12 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">最近更新</h2>
         {allDocs.length > 0 ? (
-          <ul className="space-y-2">
+          <ul className="space-y-3 w-full">
             {allDocs.map(doc => (
-              <li key={`${doc.category}-${doc.subcategory}-${doc.slug}`} className="flex justify-between items-center">
+              <li key={`${doc.category}-${doc.subcategory}-${doc.slug}`} className="flex justify-between items-center w-full">
                 <Link 
-                  href={`/${doc.category.toLowerCase().replace('_', '-')}/${doc.subcategory.toLowerCase()}/${doc.date}`} 
-                  className="text-blue-600 dark:text-blue-400 no-underline"
+                  href={`/${doc.category.toLowerCase().replace('_', '-')}/${doc.subcategory.toLowerCase()}/${doc.slug}`} 
+                  className="text-blue-600 dark:text-blue-400 no-underline flex-grow"
                 >
                   {doc.title} ({doc.subcategory})
                 </Link>
-                <span className="text-sm text-gray-500 dark:text-gray-400">{doc.date}</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 ml-4 flex-shrink-0">{doc.date || ''}</span>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500 dark:text-gray-400 text-center">暂无文档</p>
+          <p className="text-gray-500 dark:text-gray-400">暂无文档</p>
         )}
       </div>
     </div>

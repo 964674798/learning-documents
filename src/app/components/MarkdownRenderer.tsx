@@ -220,7 +220,7 @@ ${filteredHeadings.map(h => `<!-- ${h.text}: ${h.id} -->`).join('\n')}
         <article className="prose prose-blue dark:prose-invert max-w-none">
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2 border-none break-words">{title}</h1>
-            <time className="text-gray-500 dark:text-gray-400">{date}</time>
+            {date && <time className="text-gray-500 dark:text-gray-400">{date}</time>}
           </div>
           
           {/* 使用增强的Markdown组件渲染内容 */}

@@ -320,74 +320,94 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
     }
   }, [activeId]);
   
+  const handleHeadingClick = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    if (!id) {
+      return;
+    }
+    const element = document.getElementById(id);
+    if (element) {
+      // 设置点击标题，防止滚动检测覆盖
+      clickedHeadingRef.current = id;
+      
+      // 清除之前的定时器
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+      }
+      
+      element.scrollIntoView({ behavior: 'smooth' });
+      // 更新URL中的锚点
+      window.history.replaceState(null, '', `#${id}`);
+      setActiveId(id);
+      
+      // 设置定时器，几秒后恢复滚动检测
+      clickTimeoutRef.current = setTimeout(() => {
+        clickedHeadingRef.current = null;
+      }, 2000); // 2秒后恢复滚动检测
+    }
+  };
+  
   return (
     <div 
       ref={tocRef}
-      className="w-72 fixed top-4 right-4 max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 border border-gray-200 dark:border-gray-700"
-      style={{
-        scrollbarWidth: 'thin',
-        scrollbarColor: 'rgba(156, 163, 175, 0.5) transparent'
-      }}
+      className="sticky top-8 min-w-80 ml-8 max-h-[80vh] overflow-y-auto"
     >
-      <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3 border-b pb-2 border-gray-200 dark:border-gray-700">
-        目录 {headings.length === 0 ? '(无目录项)' : ''}
-      </h3>
-      
-      {headings.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">未找到目录项</p>
-      ) : (
-        <nav>
-          <ul className="space-y-1">
-            {headings.map((heading) => (
-              <li 
-                key={heading.id || `heading-${heading.text}-${heading.level}`} 
-                className={`py-1`}
-                style={{ paddingLeft: heading.level > 1 ? `${(heading.level - 1) * 0.75}rem` : '0' }}
-              >
-                <a 
-                  href={`#${heading.id}`}
-                  className={`
-                    block text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors
-                    ${activeId === heading.id 
-                      ? 'text-blue-600 dark:text-blue-400 font-medium' 
-                      : 'text-gray-600 dark:text-gray-400'}
-                    truncate max-w-full
-                  `}
-                  title={heading.text}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (!heading.id) {
-                      return;
-                    }
-                    const element = document.getElementById(heading.id);
-                    if (element) {
-                      // 设置点击标题，防止滚动检测覆盖
-                      clickedHeadingRef.current = heading.id;
-                      
-                      // 清除之前的定时器
-                      if (clickTimeoutRef.current) {
-                        clearTimeout(clickTimeoutRef.current);
-                      }
-                      
-                      element.scrollIntoView({ behavior: 'smooth' });
-                      // 更新URL中的锚点
-                      window.history.replaceState(null, '', `#${heading.id}`);
-                      setActiveId(heading.id);
-                      
-                      // 设置定时器，几秒后恢复滚动检测
-                      clickTimeoutRef.current = setTimeout(() => {
-                        clickedHeadingRef.current = null;
-                      }, 2000); // 2秒后恢复滚动检测
-                    }
-                  }}
-                >
-                  {heading.text}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      )}
+      <div className="relative">
+        <div className="absolute top-0 left-0 bottom-0 border-l-2 border-gray-200 dark:border-gray-700"></div>
+        <div className="pl-4 pr-2 py-2">
+          {headings.length > 0 ? (
+            <div className="toc-nav">
+              <h3 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-3">
+                目录
+              </h3>
+              <ul className="space-y-0">
+                {headings.map(heading => {
+                  const isActive = activeId === heading.id;
+                  return (
+                    <li 
+                      key={heading.id} 
+                      className={`
+                        ${
+                          heading.level === 1 
+                            ? 'pl-0' 
+                            : heading.level === 2 
+                              ? 'pl-3' 
+                              : 'pl-6'
+                        } 
+                        relative
+                      `}
+                    >
+                      {isActive && (
+                        <span 
+                          className="absolute top-0 left-0 h-full border-l-2 border-blue-600" 
+                          style={{ left: '0', marginLeft: '-1rem', zIndex: 10 }}
+                          aria-hidden="true"
+                        ></span>
+                      )}
+                      <a
+                        href={`#${heading.id}`}
+                        onClick={(e) => handleHeadingClick(e, heading.id)}
+                        className={`
+                          block py-1.5 text-sm
+                          transition-colors duration-150
+                          ${isActive 
+                            ? 'text-blue-600 dark:text-blue-400 font-medium'
+                            : 'text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-300'
+                          }
+                        `}
+                      >
+                        <span className="truncate block">{heading.text}</span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : (
+            <p className="text-gray-500 dark:text-gray-400 text-sm italic">无目录内容</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 } 

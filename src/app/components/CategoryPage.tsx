@@ -4,7 +4,7 @@ import Link from "next/link";
 
 interface Document {
   title: string;
-  date: string;
+  date?: string;
   slug: string;
   subcategory: string;
 }
@@ -15,6 +15,7 @@ interface CategoryPageProps {
   categoryPath: string;
   documents: Document[];
   emptyMessage?: string;
+  hideTitle?: boolean;
 }
 
 export default function CategoryPage({
@@ -22,7 +23,8 @@ export default function CategoryPage({
   description,
   categoryPath,
   documents,
-  emptyMessage = "暂无文档"
+  emptyMessage = "暂无文档",
+  hideTitle = false
 }: CategoryPageProps) {
   // 按子类别分组
   const docsBySubcategory: Record<string, Document[]> = {};
@@ -36,11 +38,15 @@ export default function CategoryPage({
   
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">{title}</h1>
-      
-      <p className="text-gray-600 dark:text-gray-300 mb-8">
-        {description}
-      </p>
+      {!hideTitle && (
+        <>
+          <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">{title}</h1>
+          
+          <p className="text-gray-600 dark:text-gray-300 mb-8">
+            {description}
+          </p>
+        </>
+      )}
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {Object.entries(docsBySubcategory).map(([subcategory, subcategoryDocs]) => (
@@ -55,12 +61,11 @@ export default function CategoryPage({
               {subcategoryDocs.map(doc => (
                 <li key={doc.slug}>
                   <Link 
-                    href={`/${categoryPath}/${subcategory.toLowerCase()}/${doc.date}`} 
+                    href={`/${categoryPath}/${subcategory.toLowerCase()}/${doc.slug}`} 
                     className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center no-underline"
-                    title={`${doc.title} (${doc.date})`}
+                    title={doc.title}
                   >
-                    <span className="truncate mr-2">{doc.title}</span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">{doc.date}</span>
+                    <span className="truncate">{doc.title}</span>
                   </Link>
                 </li>
               ))}
