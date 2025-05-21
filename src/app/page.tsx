@@ -1,20 +1,20 @@
 import Link from "next/link";
-import { getDocumentsByCategory } from "@/utils/docs";
+import { getDocumentsByCategory, DocMetadata } from "@/utils/docs";
 
 export default async function Home() {
-  // 获取各类文档
+  // 获取各类文档 - 只加载元数据，不加载完整内容
   const [techDocs, readingDocs, dailyLifeDocs] = await Promise.all([
-    getDocumentsByCategory('Tech_Learning'),
-    getDocumentsByCategory('Reading'),
-    getDocumentsByCategory('Daily_Life')
+    getDocumentsByCategory('Tech_Learning', false),
+    getDocumentsByCategory('Reading', false),
+    getDocumentsByCategory('Daily_Life', false)
   ]);
   
-  // 合并所有文档并按日期排序（处理可能为undefined的日期）
+  // 合并所有文档并按日期排序
   const allDocs = [...techDocs, ...readingDocs, ...dailyLifeDocs]
     .sort((a, b) => {
       // 如果日期不存在，使用当前日期
-      const dateA = a.date || new Date().toISOString().split('T')[0];
-      const dateB = b.date || new Date().toISOString().split('T')[0];
+      const dateA = (a as DocMetadata).date || new Date().toISOString().split('T')[0];
+      const dateB = (b as DocMetadata).date || new Date().toISOString().split('T')[0];
       return dateB.localeCompare(dateA);
     })
     .slice(0, 5); // 只取最近5篇
