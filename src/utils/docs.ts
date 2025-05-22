@@ -23,57 +23,6 @@ export interface DocMetadata {
 
 const DOCS_ROOT = path.join(process.cwd(), 'Documents');
 
-// 使用React的cache函数来缓存结果
-export const getDocumentsByCategory = cache(async (category: string): Promise<DocInfo[]> => {
-  try {
-    const categoryPath = path.join(DOCS_ROOT, category);
-    if (!fs.existsSync(categoryPath)) {
-      return [];
-    }
-
-    const subcategories = fs.readdirSync(categoryPath, { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
-
-    const allDocs: DocInfo[] = [];
-
-    for (const subcategory of subcategories) {
-      const subcategoryPath = path.join(categoryPath, subcategory);
-      const files = fs.readdirSync(subcategoryPath)
-        .filter(file => file.endsWith('.md'));
-
-      for (const file of files) {
-        const filePath = path.join(subcategoryPath, file);
-        const content = fs.readFileSync(filePath, 'utf8');
-        
-        // 获取文件名（不带扩展名）
-        const fileName = path.basename(file, '.md');
-        let title = fileName;
-        
-        // 从文件内容中提取标题（假设第一行是# 标题格式）
-        const firstLine = content.split('\n')[0];
-        if (firstLine && firstLine.startsWith('# ')) {
-          title = firstLine.substring(2).trim();
-        }
-        
-        allDocs.push({
-          slug: fileName,
-          title,
-          content,
-          category,
-          subcategory
-        });
-      }
-    }
-
-    return allDocs;
-
-  } catch (error) {
-    console.error(`Error reading documents from ${category}:`, error);
-    return [];
-  }
-});
-
 export const getDocumentBySlug = cache(async (category: string, subcategory: string, slug: string): Promise<DocInfo | null> => {
   try {
     const subcategoryPath = path.join(DOCS_ROOT, category, subcategory);

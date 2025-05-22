@@ -172,7 +172,16 @@ function EnhancedMarkdown({ content, headings }: { content: string, headings: { 
       heading.appendChild(anchor);
     });
     
-    console.log('MarkdownRenderer: 完成标题处理');
+    // 3. 处理图片，支持data-src属性
+    const imgElements = markdownRef.current.querySelectorAll('img');
+    imgElements.forEach(img => {
+      // 如果存在data-src属性，则使用它替换src属性
+      if (img.dataset.src) {
+        img.src = img.dataset.src;
+      }
+    });
+    
+    console.log('MarkdownRenderer: 完成标题和图片处理');
     
   }, [content, headings]);
 
