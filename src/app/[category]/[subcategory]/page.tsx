@@ -4,10 +4,10 @@ import { notFound } from "next/navigation";
 import { capitalize, slugToTitle } from "@/utils/stringUtils";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     category: string;
     subcategory: string;
-  };
+  }>;
 }
 
 // 生成可能的静态路由参数
@@ -28,14 +28,16 @@ export async function generateStaticParams() {
   return params;
 }
 
+// 解包 Promise 类型的 params
 export default async function DynamicSubcategoryPage({ params }: PageProps) {
+  const resolvedParams = await params;
+  const { category, subcategory } = resolvedParams;
+
   // 添加安全检查，确保 params 和必要的属性存在
-  if (!params || !params.category || !params.subcategory) {
-    console.error("Missing required route parameters:", params);
+  if (!resolvedParams || !category || !subcategory) {
+    console.error("Missing required route parameters:", resolvedParams);
     notFound();
   }
-  
-  const { category, subcategory } = params;
   
   // 将URL参数转换回可能的目录名称
   const possibleCategoryDirs = [

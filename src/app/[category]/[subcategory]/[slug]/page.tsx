@@ -2,14 +2,13 @@ import { getAllCategories, getSubcategories, getDocumentBySlug, getDocumentsByCa
 import { notFound } from "next/navigation";
 import { capitalize, slugToTitle } from "@/utils/stringUtils";
 import MarkdownRenderer from "../../../components/MarkdownRenderer";
-import Link from "next/link";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     category: string;
     subcategory: string;
     slug: string;
-  };
+  }>;
 }
 
 // 生成可能的静态路由参数
@@ -46,7 +45,8 @@ export async function generateStaticParams() {
 }
 
 export default async function DynamicDocumentPage({ params }: PageProps) {
-  const { category, subcategory, slug } = params;
+  const resolvedParams = await params;
+  const { category, subcategory, slug } = resolvedParams;
   
   // 将URL参数转换回可能的目录名称
   const possibleCategoryDirs = [
@@ -91,14 +91,5 @@ export default async function DynamicDocumentPage({ params }: PageProps) {
       backLink={backLink}
       backText={backText}
     />
-  );
-}
-
-// 箭头图标组件
-function ChevronLeftIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M15 18l-6-6 6-6" />
-    </svg>
   );
 }

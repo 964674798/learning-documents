@@ -188,7 +188,7 @@ export const getDocumentsByCategory = cache(async (category: string, loadFullCon
             if (firstLine && firstLine.startsWith('# ')) {
               title = firstLine.substring(2).trim();
             }
-          } catch (err) {
+          } catch {
             // 如果读取失败，使用文件名作为标题
           }
           
@@ -204,7 +204,8 @@ export const getDocumentsByCategory = cache(async (category: string, loadFullCon
       }
     }
 
-    return allDocs;
+    // 确保返回的 allDocs 类型一致
+    return allDocs as DocInfo[] | DocMetadata[];
 
   } catch (error) {
     console.error(`Error reading documents from ${category}:`, error);

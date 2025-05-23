@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getAllCategories, getDocumentsByCategory, DocMetadata } from "@/utils/docs";
-import { slugToTitle, titleToSlug } from "@/utils/stringUtils";
+import { titleToSlug } from "@/utils/stringUtils";
 
 export default async function Home() {
   const categories = await getAllCategories();
