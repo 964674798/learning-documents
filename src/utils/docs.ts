@@ -148,11 +148,14 @@ export const getDocumentsByCategory = cache(async (category: string, loadFullCon
         const filePath = path.join(subcategoryPath, file);
         const fileName = path.basename(file, '.md');
         
-        // 尝试从文件名提取日期 (假设格式为 YYYY-MM-DD_其他内容)
+        // 直接从文件属性中获取修改日期，忽略文件名中可能包含的日期
         let date: string | undefined;
-        const dateMatch = fileName.match(/^(\d{4}-\d{2}-\d{2})_/);
-        if (dateMatch) {
-          date = dateMatch[1];
+        try {
+          const stats = fs.statSync(filePath);
+          const mtime = stats.mtime; // 获取文件的修改时间
+          date = mtime.toISOString().split('T')[0]; // 格式化为 YYYY-MM-DD
+        } catch (err) {
+          console.error(`Error getting file stats for ${filePath}:`, err);
         }
         
         if (loadFullContent) {

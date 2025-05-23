@@ -5,8 +5,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeHighlight from 'rehype-highlight';
-import Link from 'next/link';
 import GithubSlugger from 'github-slugger';
+import Link from 'next/link';
 import 'highlight.js/styles/atom-one-light.css'; // 更明亮的亮色主题
 import 'github-markdown-css/github-markdown.css'; // GitHub Markdown 样式
 import TableOfContents from './TableOfContents';
@@ -16,7 +16,7 @@ interface MarkdownRendererProps {
   date: string;
   content: string;
   backLink: string;
-  backText: string;
+  backText?: string;
 }
 
 // 得到内容中的所有标题
@@ -202,7 +202,7 @@ export default function MarkdownRenderer({
   date,
   content,
   backLink,
-  backText
+  backText = '返回',
 }: MarkdownRendererProps) {
   // 提取所有标题，确保目录和内容使用相同的标题列表
   const headings = extractHeadings(content);
@@ -217,29 +217,37 @@ ${filteredHeadings.map(h => `<!-- ${h.text}: ${h.id} -->`).join('\n')}
 `;
   
   return (
-    <div className="flex justify-between mx-auto max-w-6xl px-4">
-      {/* 主要内容区域 */}
-      <div className="w-full max-w-3xl" id="content-area">
-        <div className="mb-6 mt-4">
-          <Link href={backLink} className="text-blue-600 dark:text-blue-400 hover:underline">
-            ← {backText}
-          </Link>
+    <div className="relative w-full px-4">
+      {/* 主要内容区域 - 保持在中央 */}
+      <div className="flex">
+        {/* 中央内容区域 - 固定宽度并居中 */}
+        <div className="flex-grow max-w-3xl mx-auto" id="content-area">
+          {/* 返回链接 */}
+          {backLink && (
+            <div className="mb-6 mt-4">
+              <Link href={backLink} className="text-blue-600 dark:text-blue-400 hover:underline">
+                ← {backText}
+              </Link>
+            </div>
+          )}
+          
+          <article className="prose prose-blue dark:prose-invert max-w-none">
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold mb-2 border-none break-words">{title}</h1>
+              {date && <time className="text-gray-500 dark:text-gray-400">{date}</time>}
+            </div>
+            
+            {/* 使用增强的Markdown组件渲染内容 */}
+            <EnhancedMarkdown content={contentWithHeadingIdsAsText} headings={filteredHeadings} />
+          </article>
         </div>
         
-        <article className="prose prose-blue dark:prose-invert max-w-none">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2 border-none break-words">{title}</h1>
-            {date && <time className="text-gray-500 dark:text-gray-400">{date}</time>}
+        {/* 右侧目录 - 固定宽度和位置 */}
+        <div className="w-64 hidden lg:block flex-shrink-0 ml-8">
+          <div className="sticky top-8">
+            <TableOfContents content={contentWithHeadingIdsAsText} />
           </div>
-          
-          {/* 使用增强的Markdown组件渲染内容 */}
-          <EnhancedMarkdown content={contentWithHeadingIdsAsText} headings={filteredHeadings} />
-        </article>
-      </div>
-      
-      {/* 右侧目录 */}
-      <div className="hidden lg:block">
-        <TableOfContents content={contentWithHeadingIdsAsText} />
+        </div>
       </div>
     </div>
   );
