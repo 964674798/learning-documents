@@ -1,12 +1,12 @@
 import { getAllCategories, getDocumentsByCategory } from "@/utils/docs";
 import CategoryPage from "../components/CategoryPage";
 import { notFound } from "next/navigation";
-import { capitalize, slugToTitle } from "@/utils/stringUtils";
+import { capitalize } from "@/utils/stringUtils";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     category: string;
-  };
+  }>;
 }
 
 // 生成所有可能的静态路由参数
@@ -17,9 +17,11 @@ export async function generateStaticParams() {
   }));
 }
 
+// 解包 Promise 类型的 params
 export default async function DynamicCategoryPage({ params }: PageProps) {
-  const { category } = params;
-  
+  const resolvedParams = await params;
+  const { category } = resolvedParams;
+
   // 将URL参数转换回可能的目录名称
   const possibleDirectories = [
     category,                                      // 原始形式
