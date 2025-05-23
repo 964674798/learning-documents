@@ -85,7 +85,7 @@ export default function CategoryPage({
           return (
             <div 
               key={subcategory}
-              className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow h-60 flex flex-col"
+              className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col"
             >
               {/* 子类别标题 - 可点击跳转到子类别页面 */}
               <Link 
@@ -101,16 +101,20 @@ export default function CategoryPage({
                 {limitedDocs.length > 0 ? (
                   <ul className="space-y-2">
                     {limitedDocs.map(doc => (
-                      <li key={doc.slug || 'no-slug'} className="truncate">
+                      <li key={doc.slug || 'no-slug'} className="group flex items-center justify-between space-x-2 py-1">
                         {/* 文档链接 - 直接跳转到文档页面 */}
                         <Link 
                           href={`/${catPath}/${subCatPath}/${doc.slug || ''}`}
-                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 block"
+                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 truncate flex-1"
                           title={doc.title}
                         >
                           {doc.title}
-                          {doc.date && <span className="text-xs text-gray-500 ml-2">({doc.date})</span>}
                         </Link>
+                        {doc.date && (
+                          <time className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+                            {doc.date}
+                          </time>
+                        )}
                       </li>
                     ))}
                   </ul>

@@ -29,6 +29,12 @@ export async function generateStaticParams() {
 }
 
 export default async function DynamicSubcategoryPage({ params }: PageProps) {
+  // 添加安全检查，确保 params 和必要的属性存在
+  if (!params || !params.category || !params.subcategory) {
+    console.error("Missing required route parameters:", params);
+    notFound();
+  }
+  
   const { category, subcategory } = params;
   
   // 将URL参数转换回可能的目录名称

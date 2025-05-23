@@ -65,7 +65,7 @@ function extractHeadings(content: string) {
 }
 
 // 增强代码块和标题组件
-function EnhancedMarkdown({ content, headings }: { content: string, headings: { id: string, text: string, level: number }[] }) {
+const EnhancedMarkdown = ({ content, headings }: { content: string, headings: { id: string, text: string, level: number }[] }) => {
   const markdownRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -186,7 +186,7 @@ function EnhancedMarkdown({ content, headings }: { content: string, headings: { 
   }, [content, headings]);
 
   return (
-    <div ref={markdownRef} className="markdown-body bg-transparent dark:text-white dark:[color-scheme:dark] my-8 prose-pre:p-0 prose-pre:my-0 prose-headings:border-b-0 prose-headings:no-underline">
+    <div ref={markdownRef} className="markdown-body bg-transparent dark:text-white dark:[color-scheme:dark] my-8 prose-pre:p-0 prose-pre:my-0 prose-headings:border-b-0 prose-headings:no-underline overflow-hidden">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeHighlight]}
