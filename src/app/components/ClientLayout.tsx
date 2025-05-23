@@ -16,7 +16,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       {/* 汉堡菜单按钮 - 仅在小屏幕显示 */}
       <button 
         onClick={toggleMenu} 
-        className="fixed top-4 left-4 z-40 rounded-md bg-gray-100 p-2 text-gray-600 shadow-md md:hidden"
+        className="fixed top-4 left-4 z-40 rounded-md bg-gray-100 p-2 text-gray-600 shadow-md opacity-80 md:hidden"
         aria-label="Toggle menu"
       >
         <svg 
