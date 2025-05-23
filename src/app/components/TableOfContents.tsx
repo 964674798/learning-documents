@@ -350,7 +350,7 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
   return (
     <div 
       ref={tocRef}
-      className="sticky top-8 w-full max-h-[80vh] overflow-y-auto"
+      className="fixed top-8 w-full max-h-[80vh] overflow-y-auto"
     >
       <div className="relative">
         <div className="absolute top-0 left-0 bottom-0 border-l-2 border-gray-200 dark:border-gray-700"></div>

@@ -21,8 +21,6 @@ interface MarkdownRendererProps {
 
 // 得到内容中的所有标题
 function extractHeadings(content: string) {
-  console.log('MarkdownRenderer: 开始提取标题...');
-  
   // 首先匹配所有代码块并给它们分配占位符ID
   const codeBlocks: string[] = [];
   const contentWithoutCodeBlocks = content.replace(/```[\s\S]*?```/g, (match) => {
@@ -31,13 +29,9 @@ function extractHeadings(content: string) {
     return id;
   });
   
-  console.log('MarkdownRenderer: 已移除代码块以避免误匹配');
-  
   // 匹配行首的#号，避免代码块中的#被错误识别为标题
   const headingRegex = /^(#{1,3})\s+(.+)$/gm;
   const matches = [...contentWithoutCodeBlocks.matchAll(headingRegex)];
-  
-  console.log(`MarkdownRenderer: 找到 ${matches.length} 个标题匹配`);
   
   const slugger = new GithubSlugger();
   // 确保slugger从头开始，没有之前的slug
@@ -54,12 +48,8 @@ function extractHeadings(content: string) {
       id = `heading-level-${level}-${Math.random().toString(36).substring(2, 9)}`;
     }
     
-    console.log(`MarkdownRenderer: 标题 "${text}" -> id: "${id}"`);
-    
     return { id, text, level };
   });
-  
-  console.log('MarkdownRenderer: 提取的标题:', headings);
   
   return headings;
 }
@@ -126,13 +116,10 @@ const EnhancedMarkdown = ({ content, headings }: { content: string, headings: { 
     });
     
     // 2. 处理标题，移除下划线并确保具有正确的ID
-    console.log('MarkdownRenderer: 开始处理DOM中的标题元素');
     const headingElements = markdownRef.current.querySelectorAll('h1, h2, h3, h4, h5, h6');
-    console.log(`MarkdownRenderer: 在DOM中找到 ${headingElements.length} 个标题元素`);
     
     // 创建标题文本到ID的映射
     const headingsMap = new Map(headings.map(h => [h.text, h.id]));
-    console.log('MarkdownRenderer: 标题映射表:', Object.fromEntries(headingsMap));
     
     // 使用新的slugger实例来处理DOM中的标题
     const slugger = new GithubSlugger();
@@ -147,21 +134,16 @@ const EnhancedMarkdown = ({ content, headings }: { content: string, headings: { 
       const text = heading.textContent || '';
       let id = headingsMap.get(text) || '';
       
-      console.log(`MarkdownRenderer: 处理DOM标题 #${index+1}: "${text}"`);
-      
       if (!id) {
         // 如果在Map中找不到匹配的标题，使用文本生成ID
         id = slugger.slug(text || `heading-${index}`);
-        console.log(`MarkdownRenderer: 为标题 "${text}" 生成新ID: "${id}"`);
       }
       
       // 如果此时ID还是空的，生成一个随机ID
       if (!id) {
         id = `heading-${index}-${Math.random().toString(36).substring(2, 9)}`;
-        console.log(`MarkdownRenderer: 生成随机ID "${id}" 作为最后手段`);
       }
       
-      console.log(`MarkdownRenderer: 设置标题 "${text}" 的ID为 "${id}"`);
       heading.id = id;
       
       // 添加可点击的锚点
@@ -180,8 +162,6 @@ const EnhancedMarkdown = ({ content, headings }: { content: string, headings: { 
         img.src = img.dataset.src;
       }
     });
-    
-    console.log('MarkdownRenderer: 完成标题和图片处理');
     
   }, [content, headings]);
 
@@ -209,7 +189,6 @@ export default function MarkdownRenderer({
   
   // 过滤掉目录标题自身，避免自引用
   const filteredHeadings = headings.filter(heading => heading.text !== '目录');
-  console.log('MarkdownRenderer: 过滤后的标题数量:', filteredHeadings.length);
   
   const contentWithHeadingIdsAsText = `
 ${content}
@@ -221,7 +200,7 @@ ${filteredHeadings.map(h => `<!-- ${h.text}: ${h.id} -->`).join('\n')}
       {/* 主要内容区域 - 保持在中央 */}
       <div className="flex">
         {/* 中央内容区域 - 固定宽度并居中 */}
-        <div className="flex-grow max-w-3xl mx-auto" id="content-area">
+        <div className="flex-grow max-w-3xl mx-auto overflow-hidden" id="content-area">
           {/* 返回链接 */}
           {backLink && (
             <div className="mb-6 mt-4">
@@ -240,14 +219,12 @@ ${filteredHeadings.map(h => `<!-- ${h.text}: ${h.id} -->`).join('\n')}
             {/* 使用增强的Markdown组件渲染内容 */}
             <EnhancedMarkdown content={contentWithHeadingIdsAsText} headings={filteredHeadings} />
           </article>
-        </div>
-        
-        {/* 右侧目录 - 固定宽度和位置 */}
-        <div className="w-64 hidden lg:block flex-shrink-0 ml-8">
-          <div className="sticky top-8">
+        </div>          {/* 右侧目录 - 固定宽度和位置 */}
+        {filteredHeadings.length > 0 && (
+          <div className="w-64 hidden lg:block flex-shrink-0 ml-8">
             <TableOfContents content={contentWithHeadingIdsAsText} />
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
