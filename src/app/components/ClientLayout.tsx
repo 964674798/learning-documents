@@ -12,11 +12,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   };
   
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-white dark:bg-gray-900">
       {/* 汉堡菜单按钮 - 仅在小屏幕显示 */}
       <button 
         onClick={toggleMenu} 
-        className="fixed top-4 left-4 z-40 rounded-md bg-gray-100 p-2 text-gray-600 shadow-md opacity-80 md:hidden"
+        className="fixed top-4 left-4 z-40 rounded-md bg-gray-100 dark:bg-gray-800 p-2 text-gray-600 dark:text-gray-300 shadow-md opacity-80 md:hidden"
         aria-label="Toggle menu"
       >
         <svg 
@@ -88,7 +88,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       )}
       
       {/* 调整主内容区域的左边距也应该是响应式的 */}
-      <main className="flex-1 md:ml-64 p-4">{children}</main>
+      <main className="flex-1 md:ml-64 p-4 bg-white dark:bg-gray-900 min-h-screen">{children}</main>
       
       {/* 添加CSS动画 */}
       <style jsx global>{`
